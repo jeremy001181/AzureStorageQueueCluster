@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.106
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureStorageQueueCluster", "AzureStorageQueueCluster\AzureStorageQueueCluster.csproj", "{12FB536F-920B-42FE-AED8-0FA8E992D7AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureStorageQueueCluster.Tests", "AzureStorageQueueCluster.Tests\AzureStorageQueueCluster.Tests.csproj", "{31B9DD96-986D-4025-9394-18C27D51BADA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{12FB536F-920B-42FE-AED8-0FA8E992D7AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12FB536F-920B-42FE-AED8-0FA8E992D7AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12FB536F-920B-42FE-AED8-0FA8E992D7AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12FB536F-920B-42FE-AED8-0FA8E992D7AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31B9DD96-986D-4025-9394-18C27D51BADA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31B9DD96-986D-4025-9394-18C27D51BADA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31B9DD96-986D-4025-9394-18C27D51BADA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31B9DD96-986D-4025-9394-18C27D51BADA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {077056FA-B82C-4106-9ACD-4C33E18FD753}
+	EndGlobalSection
+EndGlobal
