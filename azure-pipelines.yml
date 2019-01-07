@@ -13,7 +13,9 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  version: '1.0.0'
+  Major: 1
+  Minor: 0
+  Patch: 0
 
 steps:
 - task: DotNetCoreCLI@2
@@ -27,4 +29,4 @@ steps:
     projects: '**/*.Tests/*.csproj'
     arguments: '--configuration $(buildConfiguration) --collect "Code coverage"'
 
-- script: dotnet pack **/AzureStorageQueueCluster/*.csproj /p:PackageVersion=$(version)  # define version variable elsewhere in your pipeline
+- script: dotnet pack **/AzureStorageQueueCluster/*.csproj -c $(buildConfiguration) /p:PackageVersion=$(Major).$(Minor).$(Patch)  # define version variable elsewhere in your pipeline
