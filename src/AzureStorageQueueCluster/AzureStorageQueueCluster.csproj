@@ -2,6 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageLicenseUrl>https://opensource.org/licenses/Apache-2.0</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/jeremy001181/AzureStorageQueueCluster</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/jeremy001181/AzureStorageQueueCluster</PackageProjectUrl>
+    <Authors>Zhongming Chen</Authors>
+    <Company>Zhongming Chen</Company>
   </PropertyGroup>
 
   <ItemGroup>
