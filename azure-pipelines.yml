@@ -27,4 +27,4 @@ steps:
     projects: '**/*.Tests/*.csproj'
     arguments: '--configuration $(buildConfiguration) --collect "Code coverage"'
 
-- script: dotnet pack /p:PackageVersion=$(version)  # define version variable elsewhere in your pipeline
+- script: dotnet pack **/AzureStorageQueueCluster/*.csproj /p:PackageVersion=$(version)  # define version variable elsewhere in your pipeline
