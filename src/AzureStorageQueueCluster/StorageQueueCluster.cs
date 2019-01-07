@@ -46,7 +46,7 @@ namespace AzureStorageQueueCluster
                 await AddMessageRecusivelyAsync(next, message, cancelationToken);
             }            
             catch (StorageException ex) 
-                when (ex.RequestInformation != null && ex.RequestInformation.HttpStatusCode > 500)
+                when (ex.RequestInformation != null && ex.RequestInformation.HttpStatusCode >= 500)
             {
                 await AddMessageRecusivelyAsync(next, message, cancelationToken);
             }

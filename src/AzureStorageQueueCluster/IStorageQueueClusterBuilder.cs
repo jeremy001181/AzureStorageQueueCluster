@@ -2,6 +2,6 @@
 {
     public interface IStorageQueueClusterBuilder
     {
-
+        IStorageQueueCluster Build();
     }
 }

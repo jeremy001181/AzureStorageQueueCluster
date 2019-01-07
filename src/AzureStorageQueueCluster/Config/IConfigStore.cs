@@ -2,6 +2,6 @@
 {
     public interface IConfigStore
     {
-        string GetConfig();
+        StorageQueueClusterConfig GetConfig();
     }
 }

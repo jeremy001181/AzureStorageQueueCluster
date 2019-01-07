@@ -1,7 +1,7 @@
 ﻿namespace AzureStorageQueueCluster.Config
 {
-    internal class QueueConfig
+    public class QueueConfig
     {
-        internal string Name { get; set; }
+        public string Name { get; set; }
     }
 }

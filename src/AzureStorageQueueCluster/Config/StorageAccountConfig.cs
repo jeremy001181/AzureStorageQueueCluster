@@ -2,9 +2,9 @@
 
 namespace AzureStorageQueueCluster.Config
 {
-    internal class StorageAccountConfig
+    public class StorageAccountConfig
     {
-        internal string ConnectionString { get; set; }
-        internal IEnumerable<QueueConfig> Queues { get; set; }
+        public string ConnectionString { get; set; }
+        public IList<QueueConfig> Queues { get; set; }
     }
 }

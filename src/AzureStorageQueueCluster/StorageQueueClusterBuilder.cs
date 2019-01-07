@@ -1,32 +1,40 @@
 ﻿using System.Linq;
 using System.Net;
-using Microsoft.WindowsAzure.Storage;
 using AzureStorageQueueCluster.Config;
-using Newtonsoft.Json;
-using System.Collections.Generic;
+using System;
 
 namespace AzureStorageQueueCluster
 {
-    class StorageQueueClusterBuilder : IStorageQueueClusterBuilder
+    public class StorageQueueClusterBuilder : IStorageQueueClusterBuilder
     {
         private IConfigStore configStore;
+        private readonly ICloudStorageAccountParser cloudStorageAccountParser;
+        private readonly IConfigValidator configValidator;
 
-        public StorageQueueClusterBuilder(IConfigStore configStore)
+        public StorageQueueClusterBuilder(IConfigStore configStore) : this(configStore, new CloudStorageAccountParser(), new ConfigValidator())
         {
-            this.configStore = configStore;
+        }
+
+        internal StorageQueueClusterBuilder(IConfigStore configStore
+            , ICloudStorageAccountParser cloudStorageAccountParser
+            , IConfigValidator configValidator)
+        {
+            this.configStore = configStore ?? throw new ArgumentNullException(nameof(configStore));
+
+            this.cloudStorageAccountParser = cloudStorageAccountParser;
+            this.configValidator = configValidator;
         }
 
         public IStorageQueueCluster Build()
         {
-            var configJson = configStore.GetConfig();
+            var config = configStore.GetConfig();
 
-            var config = JsonConvert.DeserializeObject<List<StorageAccountConfig>>(configJson);
+            configValidator.EnsureValidConfiguration(config);
 
-            var allCloudQueues = config.SelectMany(storageAccount =>
+            var allCloudQueues = config.StorageAccounts.SelectMany(storageAccount =>
             {
-                var account = CloudStorageAccount.Parse(storageAccount.ConnectionString);
-
-                ServicePointManager.FindServicePoint(account.QueueEndpoint).UseNagleAlgorithm = false;
+                var account = cloudStorageAccountParser.Parse(storageAccount.ConnectionString);
+                OptimizeServicePoint(account.QueueEndpoint);
 
                 var queueClient = account.CreateCloudQueueClient();
 
@@ -37,6 +45,16 @@ namespace AzureStorageQueueCluster
             }).ToList();
 
             return new StorageQueueCluster(allCloudQueues);
+        }
+
+        private static void OptimizeServicePoint(Uri queueEndpoint)
+        {
+            var servicePoint = ServicePointManager.FindServicePoint(queueEndpoint);
+
+            servicePoint.UseNagleAlgorithm = false;
+            if (servicePoint.ConnectionLimit < 200) {
+                servicePoint.ConnectionLimit = 200;
+            }
         }
     }
 }
