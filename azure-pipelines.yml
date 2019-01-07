@@ -13,4 +13,4 @@ steps:
 
 - task: DotNetCoreInstaller@0
 
-- script: dotnet restore
+- script: dotnet restore **/*.sln
