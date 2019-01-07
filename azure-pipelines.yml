@@ -22,11 +22,14 @@ steps:
   inputs:
     command: 'restore'
     projects: '**/**/*.csproj'  
+  displayName: 'dotnet restore'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: test
     projects: '**/*.Tests/*.csproj'
-    arguments: '--configuration $(buildConfiguration) --collect "Code coverage"'
+    arguments: '--configuration $(buildConfiguration) --collect "Code coverage"'  
+  displayName: 'dotnet test'
 
 - script: dotnet pack **/AzureStorageQueueCluster/*.csproj -c $(buildConfiguration) /p:PackageVersion=$(Major).$(Minor).$(Patch)  # define version variable elsewhere in your pipeline
+  displayName: 'dotnet pack'
