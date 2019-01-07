@@ -9,8 +9,13 @@ trigger:
 pool:
   vmImage: 'Ubuntu-16.04'
 
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
 steps:
-
-- task: DotNetCoreInstaller@0
-
-- script: dotnet restore **/*.sln
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: '**/**/*.csproj'
