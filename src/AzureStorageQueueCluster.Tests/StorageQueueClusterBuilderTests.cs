@@ -66,7 +66,7 @@ namespace AzureStorageQueueCluster.Tests
         }
 
         [Fact]
-        public void Should_build_a_cluster_that_has_number_of_queue_matches_queue_config_given()
+        public void Should_build_a_queue_cluster_correctly()
         {
             // arrange
             var storageAccounts = new List<StorageAccountConfig>() {
@@ -75,7 +75,7 @@ namespace AzureStorageQueueCluster.Tests
                                    ConnectionString = "conn",
                                    Queues = new List<QueueConfig>(){
                                        new QueueConfig{
-                                           Name = "queue"
+                                           Name = "queue1"
                                        },
                                        new QueueConfig{
                                            Name = "queue2"
@@ -107,6 +107,8 @@ namespace AzureStorageQueueCluster.Tests
 
             foreach (var storageAccount in storageAccounts)
             {
+                cloudStorageAccountParser.Verify(self => self.Parse(storageAccount.ConnectionString), Times.Once);
+
                 foreach (var queue in storageAccount.Queues)
                 {
                     queueClient.Verify(self => self.GetQueueReference(queue.Name), Times.Once);
