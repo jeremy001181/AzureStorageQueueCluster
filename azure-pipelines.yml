@@ -3,8 +3,8 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-trigger:
-- master
+#trigger:
+#- master
 
 pool:
   vmImage: 'Ubuntu-16.04'
@@ -13,6 +13,7 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
+  version: '1.0.0'
 
 steps:
 - task: DotNetCoreCLI@2
@@ -26,4 +27,4 @@ steps:
     projects: '**/*.Tests/*.csproj'
     arguments: '--configuration $(buildConfiguration) --collect "Code coverage"'
 
-- task: PublishBuildArtifacts@1
+- script: dotnet pack /p:PackageVersion=$(version)  # define version variable elsewhere in your pipeline
