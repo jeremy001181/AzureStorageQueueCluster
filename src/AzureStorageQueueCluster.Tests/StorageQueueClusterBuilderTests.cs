@@ -16,8 +16,8 @@ namespace AzureStorageQueueCluster.Tests
         private readonly Mock<CloudQueueClient> queueClient;
         private readonly Mock<CloudStorageAccount> cloudStorageAccout;
         private readonly Mock<ICloudStorageAccountParser> cloudStorageAccountParser;
-        private readonly Mock<IConfigStore> configStore;
         private readonly StorageQueueClusterBuilder builder;
+        private StorageQueueClusterConfig config = new StorageQueueClusterConfig();
 
         public StorageQueueClusterBuilderTests()
         {
@@ -39,28 +39,21 @@ namespace AzureStorageQueueCluster.Tests
             cloudStorageAccountParser = new Mock<ICloudStorageAccountParser>();
             cloudStorageAccountParser.Setup(self => self.Parse(It.IsAny<string>()))
                                      .Returns(cloudStorageAccout.Object);
-
-            configStore = new Mock<IConfigStore>();
-
-            builder = new StorageQueueClusterBuilder(configStore.Object, cloudStorageAccountParser.Object, new ConfigValidator());
+            
+            builder = new StorageQueueClusterBuilder(config, cloudStorageAccountParser.Object, new ConfigValidator());
         }
 
         [Fact]
         public void Should_throw_InvalidOperationException_when_there_is_no_storage_account_in_config()
         {
-            configStore.Setup(self => self.GetConfig())
-                       .Returns(new StorageQueueClusterConfig
-                       {
-                           StorageAccounts = new List<StorageAccountConfig>()
-                       });
+            config = new StorageQueueClusterConfig();
 
             Assert.Throws<InvalidOperationException>(() => builder.Build());
 
-            configStore.Setup(self => self.GetConfig())
-                      .Returns(new StorageQueueClusterConfig
-                      {
-                          StorageAccounts = null
-                      });
+
+            config = new StorageQueueClusterConfig() {
+                StorageAccounts = new List<StorageAccountConfig>()
+            };
 
             Assert.Throws<InvalidOperationException>(() => builder.Build());
         }
@@ -69,7 +62,7 @@ namespace AzureStorageQueueCluster.Tests
         public void Should_build_a_queue_cluster_correctly()
         {
             // arrange
-            var storageAccounts = new List<StorageAccountConfig>() {
+            config.StorageAccounts = new List<StorageAccountConfig>() {
                                new StorageAccountConfig()
                                {
                                    ConnectionString = "conn",
@@ -92,20 +85,15 @@ namespace AzureStorageQueueCluster.Tests
                                    }
                                }
                            };
-            configStore.Setup(self => self.GetConfig())
-                       .Returns(new StorageQueueClusterConfig
-                       {
-                           StorageAccounts = storageAccounts
-                       });
 
             // act
             var actual = builder.Build();
 
             // assert
             Assert.IsAssignableFrom<IStorageQueueCluster>(actual);
-            cloudStorageAccout.Verify(self => self.CreateCloudQueueClient(), Times.Exactly(storageAccounts.Count));
+            cloudStorageAccout.Verify(self => self.CreateCloudQueueClient(), Times.Exactly(config.StorageAccounts.Count));
 
-            foreach (var storageAccount in storageAccounts)
+            foreach (var storageAccount in config.StorageAccounts)
             {
                 cloudStorageAccountParser.Verify(self => self.Parse(storageAccount.ConnectionString), Times.Once);
 

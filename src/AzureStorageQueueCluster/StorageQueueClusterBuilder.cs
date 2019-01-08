@@ -7,19 +7,19 @@ namespace AzureStorageQueueCluster
 {
     public class StorageQueueClusterBuilder : IStorageQueueClusterBuilder
     {
-        private IConfigStore configStore;
+        private StorageQueueClusterConfig config;
         private readonly ICloudStorageAccountParser cloudStorageAccountParser;
         private readonly IConfigValidator configValidator;
 
-        public StorageQueueClusterBuilder(IConfigStore configStore) : this(configStore, new CloudStorageAccountParser(), new ConfigValidator())
+        public StorageQueueClusterBuilder(StorageQueueClusterConfig config) : this(config, new CloudStorageAccountParser(), new ConfigValidator())
         {
         }
 
-        internal StorageQueueClusterBuilder(IConfigStore configStore
+        internal StorageQueueClusterBuilder(StorageQueueClusterConfig config
             , ICloudStorageAccountParser cloudStorageAccountParser
             , IConfigValidator configValidator)
         {
-            this.configStore = configStore ?? throw new ArgumentNullException(nameof(configStore));
+            this.config = config ?? throw new ArgumentNullException(nameof(config));
 
             this.cloudStorageAccountParser = cloudStorageAccountParser;
             this.configValidator = configValidator;
@@ -27,8 +27,6 @@ namespace AzureStorageQueueCluster
 
         public IStorageQueueCluster Build()
         {
-            var config = configStore.GetConfig();
-
             configValidator.EnsureValidConfiguration(config);
 
             var allCloudQueues = config.StorageAccounts.SelectMany(storageAccount =>
