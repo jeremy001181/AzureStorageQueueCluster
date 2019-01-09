@@ -2,6 +2,7 @@
 using System.Net;
 using AzureStorageQueueCluster.Config;
 using System;
+using AzureStorageQueueCluster.MessageSenders;
 
 namespace AzureStorageQueueCluster
 {
@@ -42,7 +43,7 @@ namespace AzureStorageQueueCluster
                 return cloudQueues;
             }).ToList();
 
-            return new StorageQueueCluster(allCloudQueues);
+            return new StorageQueueCluster(allCloudQueues, new ActivePassiveMessageSender());
         }
 
         private static void OptimizeServicePoint(Uri queueEndpoint)

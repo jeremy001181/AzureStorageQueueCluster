@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using AzureStorageQueueCluster.MessageSenders;
 using Microsoft.WindowsAzure.Storage.Queue;
 
 namespace AzureStorageQueueCluster
@@ -9,42 +10,22 @@ namespace AzureStorageQueueCluster
     internal class StorageQueueCluster : IStorageQueueCluster
     {
         private readonly IList<CloudQueue> cloudQueues;
+        private readonly IMessageSender sender;
 
-        internal StorageQueueCluster(IList<CloudQueue> cloudQueues)
+        internal StorageQueueCluster(IList<CloudQueue> cloudQueues, IMessageSender sender)
         {
             if (cloudQueues == null || cloudQueues.Count == 0) {
                 throw new ArgumentException("Cannot initialize cluster with no queue", nameof(cloudQueues));
             }
 
             this.cloudQueues = cloudQueues;
+            this.sender = sender;
         }
         
         public async Task AddMessageAsync(StorageQueueMessage message, CancellationToken cancelationToken = default(CancellationToken)) {
-            await AddMessageRecusivelyAsync(0, 0, message, cancelationToken);
-        }
 
-        private async Task AddMessageRecusivelyAsync(int index, int failed, StorageQueueMessage message, CancellationToken cancelationToken)
-        {
-            if (index >= cloudQueues.Count)
-            {
-                return;
-            }
-            var next = index + 1;
-            var cloudQueue = cloudQueues[index];
-            try
-            {
-                await cloudQueue.AddMessageAsync(message.Data, message.TimeToLive, message.InitialVisibilityDelay, message.Options, message.OperationContext, cancelationToken)
-                                .ConfigureAwait(false);
-            }
-            catch (Exception ex) when (ex.IsTransilient())
-            {
-                if (++failed == cloudQueues.Count)
-                {
-                    throw;
-                }
+            await sender.SendAsync(cloudQueues, message, cancelationToken);
 
-                await AddMessageRecusivelyAsync(next, failed, message, cancelationToken);
-            }
-        }
+        }        
     }
 }
