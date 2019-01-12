@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using AzureStorageQueueCluster.MessageSenders;
+using AzureStorageQueueCluster.MessageDispatchers;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Moq;
 using Xunit;
@@ -16,12 +16,12 @@ namespace AzureStorageQueueCluster.Tests
         private readonly Mock<CloudQueue> queue2 = new Mock<CloudQueue>(new Uri("http://queue2"));
         private readonly Mock<CloudQueue> queue3 = new Mock<CloudQueue>(new Uri("http://queue3"));
         private readonly IList<CloudQueue> cloudQueues;
-        private readonly ActivePassiveMessageSender sender;
+        private readonly ActivePassiveMessageDispatcher sender;
 
         public ActivePassiveMessageSenderTests()
         {
             cloudQueues = new List<CloudQueue>() { queue1.Object, queue2.Object, queue3.Object };        
-            sender = new ActivePassiveMessageSender();
+            sender = new ActivePassiveMessageDispatcher();
         }        
 
         [Fact]

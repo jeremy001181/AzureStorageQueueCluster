@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AzureStorageQueueCluster.MessageSenders
+namespace AzureStorageQueueCluster.MessageDispatchers
 {
-    internal class ActivePassiveMessageSender : IMessageSender
+    internal class ActivePassiveMessageDispatcher : IMessageDispatcher
     {
         public async Task SendAsync(IList<CloudQueue> cloudQueues, StorageQueueMessage message, CancellationToken cancelationToken = default(CancellationToken))
         {
