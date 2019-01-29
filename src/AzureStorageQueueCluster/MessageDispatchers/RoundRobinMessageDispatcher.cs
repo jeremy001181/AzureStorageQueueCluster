@@ -8,9 +8,20 @@ namespace AzureStorageQueueCluster.MessageDispatchers
 {
     internal class RoundRobinMessageDispatcher : IMessageDispatcher
     {
-        public Task SendAsync(IList<CloudQueue> cloudQueues, StorageQueueMessage message, CancellationToken cancelationToken = default(CancellationToken))
+        private IList<CloudQueue> cloudQueues;
+        private RoundRobbinNumberResolver roundRobbinNumberResolver;
+
+        public RoundRobinMessageDispatcher(IList<CloudQueue> cloudQueues)
         {
-            throw new NotImplementedException();
+            this.cloudQueues = cloudQueues ?? throw new ArgumentNullException(nameof(cloudQueues));
+            this.roundRobbinNumberResolver = new RoundRobbinNumberResolver(cloudQueues.Count);
+        }
+
+        public Task SendAsync(StorageQueueMessage message, CancellationToken cancelationToken = default(CancellationToken))
+        {
+            var nextQueue = roundRobbinNumberResolver.GetNextNumber();
+
+            return cloudQueues[nextQueue].AddMessageAsync(message.Data);
         }
     }
 }

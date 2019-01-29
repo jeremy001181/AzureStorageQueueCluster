@@ -7,7 +7,7 @@ using Microsoft.WindowsAzure.Storage.Queue;
 using Moq;
 using Xunit;
 
-namespace AzureStorageQueueCluster.Tests
+namespace AzureStorageQueueCluster.Tests.UnitTests
 {
     public class ActivePassiveMessageSenderTests
     {
@@ -21,13 +21,13 @@ namespace AzureStorageQueueCluster.Tests
         public ActivePassiveMessageSenderTests()
         {
             cloudQueues = new List<CloudQueue>() { queue1.Object, queue2.Object, queue3.Object };        
-            sender = new ActivePassiveMessageDispatcher();
+            sender = new ActivePassiveMessageDispatcher(cloudQueues);
         }        
 
         [Fact]
         public async Task Should_send_message_via_the_first_queue_in_the_cluster()
         {
-            await sender.SendAsync(cloudQueues, message);
+            await sender.SendAsync(message);
 
             queue1.Verify(AddMessageAsync(message), Times.Once);
             queue2.Verify(AddMessageAsync(message), Times.Never);
@@ -39,7 +39,7 @@ namespace AzureStorageQueueCluster.Tests
         {
             queue1.Setup(AddMessageAsync(message)).Throws<TaskCanceledException>();
 
-            await sender.SendAsync(cloudQueues, message);
+            await sender.SendAsync(message);
 
             queue1.Verify(AddMessageAsync(message), Times.Once);
             queue2.Verify(AddMessageAsync(message), Times.Once);
@@ -53,7 +53,7 @@ namespace AzureStorageQueueCluster.Tests
             queue1.Setup(AddMessageAsync(message)).Throws<TaskCanceledException>();
             queue2.Setup(AddMessageAsync(message)).Throws<TaskCanceledException>();
 
-            await sender.SendAsync(cloudQueues, message);
+            await sender.SendAsync(message);
 
             queue1.Verify(AddMessageAsync(message), Times.Once);
             queue2.Verify(AddMessageAsync(message), Times.Once);
@@ -68,7 +68,7 @@ namespace AzureStorageQueueCluster.Tests
             queue2.Setup(AddMessageAsync(message)).Throws<TaskCanceledException>();
             queue3.Setup(AddMessageAsync(message)).Throws<TaskCanceledException>();
 
-            await Assert.ThrowsAsync<TaskCanceledException>(async () => await sender.SendAsync(cloudQueues, message));
+            await Assert.ThrowsAsync<TaskCanceledException>(async () => await sender.SendAsync(message));
         }
 
         private System.Linq.Expressions.Expression<Func<CloudQueue, Task>> AddMessageAsync(StorageQueueMessage message)

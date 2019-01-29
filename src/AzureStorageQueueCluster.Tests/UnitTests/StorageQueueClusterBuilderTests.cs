@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using Xunit;
 
-namespace AzureStorageQueueCluster.Tests
+namespace AzureStorageQueueCluster.Tests.UnitTests
 {
     public partial class StorageQueueClusterBuilderTests
     {

@@ -7,6 +7,6 @@ namespace AzureStorageQueueCluster.MessageDispatchers
 {
     internal interface IMessageDispatcher
     {
-        Task SendAsync(IList<CloudQueue> cloudQueues, StorageQueueMessage message, CancellationToken cancelationToken = default(CancellationToken));
+        Task SendAsync(StorageQueueMessage message, CancellationToken cancelationToken = default(CancellationToken));
     }
 }

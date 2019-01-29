@@ -8,9 +8,16 @@ namespace AzureStorageQueueCluster.MessageDispatchers
 {
     internal class ActivePassiveMessageDispatcher : IMessageDispatcher
     {
-        public async Task SendAsync(IList<CloudQueue> cloudQueues, StorageQueueMessage message, CancellationToken cancelationToken = default(CancellationToken))
+        private IList<CloudQueue> cloudQueues;
+
+        public ActivePassiveMessageDispatcher(IList<CloudQueue> cloudQueues)
         {
-            await AddMessageRecusivelyAsync(cloudQueues, message, 0, 0, cancelationToken);
+            this.cloudQueues = cloudQueues;
+        }
+
+        public Task SendAsync(StorageQueueMessage message, CancellationToken cancelationToken = default(CancellationToken))
+        {
+            return AddMessageRecusivelyAsync(cloudQueues, message, 0, 0, cancelationToken);
         }
 
         private async Task AddMessageRecusivelyAsync(IList<CloudQueue> cloudQueues, StorageQueueMessage message, int index, int failed, CancellationToken cancelationToken)

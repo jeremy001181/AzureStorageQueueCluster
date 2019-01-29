@@ -42,8 +42,13 @@ namespace AzureStorageQueueCluster
                                         .ToList();
                 return cloudQueues;
             }).ToList();
+            
+            if (allCloudQueues.Count == 0)
+            {
+                throw new ArgumentException("Cannot initialize cluster with no queue", nameof(allCloudQueues));
+            }
 
-            return new StorageQueueCluster(allCloudQueues, new ActivePassiveMessageDispatcher());
+            return new StorageQueueCluster(new ActivePassiveMessageDispatcher(allCloudQueues));
         }
 
         private static void OptimizeServicePoint(Uri queueEndpoint)
