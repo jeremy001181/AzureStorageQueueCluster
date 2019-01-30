@@ -4,7 +4,6 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -18,20 +17,23 @@ namespace AzureStorageQueueCluster.Tests.UnitTests
             var queue1 = new Mock<CloudQueue>(uri);
             var queue2 = new Mock<CloudQueue>(uri);
             var queue3 = new Mock<CloudQueue>(uri);
-
-            var roundRobinDispatcher = new RoundRobinMessageDispatcher(new List<CloudQueue>() {
+            var queues = new List<CloudQueue>() {
                 queue1.Object, queue2.Object, queue3.Object
-            });
+            };
+            var totalMessages = 30;
 
-            var tasks = new int[30].Select((i) => Task.Run(async () => {
+            var roundRobinDispatcher = new RoundRobinMessageDispatcher(queues);
+
+            var tasks = new int[totalMessages].Select((i) => Task.Run(async () => {
                 await roundRobinDispatcher.SendAsync(new StorageQueueMessage(new CloudQueueMessage("test")));
             }));
 
             await Task.WhenAll(tasks);
 
-            queue1.Verify(self => self.AddMessageAsync(It.IsAny<CloudQueueMessage>()), Times.Exactly(10));
-            queue2.Verify(self => self.AddMessageAsync(It.IsAny<CloudQueueMessage>()), Times.Exactly(10));
-            queue3.Verify(self => self.AddMessageAsync(It.IsAny<CloudQueueMessage>()), Times.Exactly(10));
+            var expected = totalMessages / queues.Count;
+            queue1.Verify(self => self.AddMessageAsync(It.IsAny<CloudQueueMessage>()), Times.Exactly(expected));
+            queue2.Verify(self => self.AddMessageAsync(It.IsAny<CloudQueueMessage>()), Times.Exactly(expected));
+            queue3.Verify(self => self.AddMessageAsync(It.IsAny<CloudQueueMessage>()), Times.Exactly(expected));
         }
     }
 }
