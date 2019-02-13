@@ -2,58 +2,40 @@
 using System.Net;
 using AzureStorageQueueCluster.Config;
 using System;
-using AzureStorageQueueCluster.MessageSenders;
+using AzureStorageQueueCluster.MessageDispatchers;
 
 namespace AzureStorageQueueCluster
 {
     public class StorageQueueClusterBuilder : IStorageQueueClusterBuilder
     {
         private StorageQueueClusterConfig config;
-        private readonly ICloudStorageAccountParser cloudStorageAccountParser;
-        private readonly IConfigValidator configValidator;
+        private readonly IStorageQeueueClusterConfigParser cloudQueueParser;
 
-        public StorageQueueClusterBuilder(StorageQueueClusterConfig config) : this(config, new CloudStorageAccountParser(), new ConfigValidator())
+        public StorageQueueClusterBuilder(StorageQueueClusterConfig config) 
+            : this (config, new StorageQeueueClusterConfigParser(new CloudStorageAccountParser()))
         {
         }
 
-        internal StorageQueueClusterBuilder(StorageQueueClusterConfig config
-            , ICloudStorageAccountParser cloudStorageAccountParser
-            , IConfigValidator configValidator)
+        internal StorageQueueClusterBuilder(StorageQueueClusterConfig config, IStorageQeueueClusterConfigParser cloudQueueParser)
         {
             this.config = config ?? throw new ArgumentNullException(nameof(config));
-
-            this.cloudStorageAccountParser = cloudStorageAccountParser;
-            this.configValidator = configValidator;
+            this.cloudQueueParser = cloudQueueParser ?? throw new ArgumentNullException(nameof(cloudQueueParser));
         }
 
         public IStorageQueueCluster Build()
         {
-            configValidator.EnsureValidConfiguration(config);
+            var allCloudQueues = cloudQueueParser.Parse(config);
 
-            var allCloudQueues = config.StorageAccounts.SelectMany(storageAccount =>
+            if (allCloudQueues.Count == 0)
             {
-                var account = cloudStorageAccountParser.Parse(storageAccount.ConnectionString);
-                OptimizeServicePoint(account.QueueEndpoint);
-
-                var queueClient = account.CreateCloudQueueClient();
-
-                var cloudQueues = storageAccount.Queues
-                                        .Select(queue => queueClient.GetQueueReference(queue.Name))
-                                        .ToList();
-                return cloudQueues;
-            }).ToList();
-
-            return new StorageQueueCluster(allCloudQueues, new ActivePassiveMessageSender());
-        }
-
-        private static void OptimizeServicePoint(Uri queueEndpoint)
-        {
-            var servicePoint = ServicePointManager.FindServicePoint(queueEndpoint);
-
-            servicePoint.UseNagleAlgorithm = false;
-            if (servicePoint.ConnectionLimit < 200) {
-                servicePoint.ConnectionLimit = 200;
+                throw new ArgumentException("Cannot initialize cluster with no queue", nameof(allCloudQueues));
             }
+
+            var messageDispatcher = config.DispatchMode == DispatchMode.ActivePassive
+                ? new ActivePassiveMessageDispatcher(allCloudQueues) as IMessageDispatcher
+                : new RoundRobinMessageDispatcher(allCloudQueues);
+
+            return new StorageQueueCluster(messageDispatcher);
         }
     }
 }

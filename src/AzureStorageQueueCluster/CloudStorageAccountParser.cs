@@ -9,9 +9,4 @@ namespace AzureStorageQueueCluster
             return CloudStorageAccount.Parse(connectionString);
         }
     }
-
-    internal interface ICloudStorageAccountParser
-    {
-        CloudStorageAccount Parse(string connectionString);
-    }
 }

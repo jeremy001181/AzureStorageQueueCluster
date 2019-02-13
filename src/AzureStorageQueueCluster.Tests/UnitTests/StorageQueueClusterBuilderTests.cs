@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using Xunit;
 
-namespace AzureStorageQueueCluster.Tests
+namespace AzureStorageQueueCluster.Tests.UnitTests
 {
     public partial class StorageQueueClusterBuilderTests
     {
@@ -40,7 +40,7 @@ namespace AzureStorageQueueCluster.Tests
             cloudStorageAccountParser.Setup(self => self.Parse(It.IsAny<string>()))
                                      .Returns(cloudStorageAccout.Object);
             
-            builder = new StorageQueueClusterBuilder(config, cloudStorageAccountParser.Object, new ConfigValidator());
+            builder = new StorageQueueClusterBuilder(config, new StorageQeueueClusterConfigParser(cloudStorageAccountParser.Object));
         }
 
         [Fact]
@@ -56,6 +56,34 @@ namespace AzureStorageQueueCluster.Tests
             };
 
             Assert.Throws<InvalidOperationException>(() => builder.Build());
+        }
+
+        [Theory]
+        [InlineData(DispatchMode.ActivePassive)]
+        [InlineData(DispatchMode.RoundRobbin)]
+        public void Should_choose_correct_message_dispatcher_when_build_cluster(DispatchMode dispatchMode)
+        {
+            // arrange
+            config.DispatchMode = dispatchMode;
+            config.StorageAccounts = new List<StorageAccountConfig>() {
+                new StorageAccountConfig()
+                               {                
+                                   ConnectionString = "conn",
+                                   Queues = new List<QueueConfig>(){
+                                       new QueueConfig{
+                                           Name = "queue1"
+                                       },
+                                       new QueueConfig{
+                                           Name = "queue2"
+                                       }
+                                   }
+                               }
+                           };
+
+            // act
+            var actual = builder.Build();
+
+            
         }
 
         [Fact]
