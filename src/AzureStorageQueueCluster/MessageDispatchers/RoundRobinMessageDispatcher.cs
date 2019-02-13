@@ -8,10 +8,10 @@ namespace AzureStorageQueueCluster.MessageDispatchers
 {
     internal class RoundRobinMessageDispatcher : IMessageDispatcher
     {
-        private IList<CloudQueue> cloudQueues;
+        private IReadOnlyList<CloudQueue> cloudQueues;
         private RoundRobbinNumberResolver roundRobbinNumberResolver;
 
-        public RoundRobinMessageDispatcher(IList<CloudQueue> cloudQueues)
+        public RoundRobinMessageDispatcher(IReadOnlyList<CloudQueue> cloudQueues)
         {
             this.cloudQueues = cloudQueues ?? throw new ArgumentNullException(nameof(cloudQueues));
             this.roundRobbinNumberResolver = new RoundRobbinNumberResolver(cloudQueues.Count);

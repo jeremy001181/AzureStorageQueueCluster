@@ -8,9 +8,9 @@ namespace AzureStorageQueueCluster.MessageDispatchers
 {
     internal class ActivePassiveMessageDispatcher : IMessageDispatcher
     {
-        private IList<CloudQueue> cloudQueues;
+        private IReadOnlyList<CloudQueue> cloudQueues;
 
-        public ActivePassiveMessageDispatcher(IList<CloudQueue> cloudQueues)
+        public ActivePassiveMessageDispatcher(IReadOnlyList<CloudQueue> cloudQueues)
         {
             this.cloudQueues = cloudQueues;
         }
@@ -20,7 +20,7 @@ namespace AzureStorageQueueCluster.MessageDispatchers
             return AddMessageRecusivelyAsync(cloudQueues, message, 0, 0, cancelationToken);
         }
 
-        private async Task AddMessageRecusivelyAsync(IList<CloudQueue> cloudQueues, StorageQueueMessage message, int index, int failed, CancellationToken cancelationToken)
+        private async Task AddMessageRecusivelyAsync(IReadOnlyList<CloudQueue> cloudQueues, StorageQueueMessage message, int index, int failed, CancellationToken cancelationToken)
         {
             if (index >= cloudQueues.Count)
             {

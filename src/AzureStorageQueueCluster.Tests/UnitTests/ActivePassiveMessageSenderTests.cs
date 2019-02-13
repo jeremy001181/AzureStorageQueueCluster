@@ -15,7 +15,7 @@ namespace AzureStorageQueueCluster.Tests.UnitTests
         private readonly Mock<CloudQueue> queue1 = new Mock<CloudQueue>(new Uri("http://queue1"));
         private readonly Mock<CloudQueue> queue2 = new Mock<CloudQueue>(new Uri("http://queue2"));
         private readonly Mock<CloudQueue> queue3 = new Mock<CloudQueue>(new Uri("http://queue3"));
-        private readonly IList<CloudQueue> cloudQueues;
+        private readonly IReadOnlyList<CloudQueue> cloudQueues;
         private readonly ActivePassiveMessageDispatcher sender;
 
         public ActivePassiveMessageSenderTests()
