@@ -20,18 +20,17 @@ namespace AzureStorageQueueCluster.MessageDispatchers
             return AddMessageRecusivelyAsync(cloudQueues, message, 0, 0, cancelationToken);
         }
 
-        private async Task AddMessageRecusivelyAsync(IReadOnlyList<CloudQueue> cloudQueues, StorageQueueMessage message, int index, int failed, CancellationToken cancelationToken)
+        private Task AddMessageRecusivelyAsync(IReadOnlyList<CloudQueue> cloudQueues, StorageQueueMessage message, int index, int failed, CancellationToken cancelationToken)
         {
             if (index >= cloudQueues.Count)
             {
-                return;
+                return Task.CompletedTask;
             }
             var next = index + 1;
             var cloudQueue = cloudQueues[index];
             try
             {
-                await cloudQueue.AddMessageAsync(message.Data, message.TimeToLive, message.InitialVisibilityDelay, message.Options, message.OperationContext, cancelationToken)
-                                .ConfigureAwait(false);
+                return cloudQueue.AddMessageAsync(message.Data, message.TimeToLive, message.InitialVisibilityDelay, message.Options, message.OperationContext, cancelationToken);
             }
             catch (Exception ex) when (ex.IsTransilient())
             {
@@ -40,7 +39,7 @@ namespace AzureStorageQueueCluster.MessageDispatchers
                     throw;
                 }
 
-                await AddMessageRecusivelyAsync(cloudQueues, message, next, failed, cancelationToken);
+                return AddMessageRecusivelyAsync(cloudQueues, message, next, failed, cancelationToken);
             }
         }
     }
