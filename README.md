@@ -1,6 +1,6 @@
 # AzureStorageQueueCluster
 Supports sending messages to a cluster of queues via two different dispatch mode that is configurable.
-1. Active and passive, all messages will be sent to the first queue in the list as primary, messages will be automatically retry on others queues (secondary) in the list if failed to be delivered to primary queue.
+1. Active and passive, all messages will be sent to the first queue in the config list as primary method, messages then will be automatically retry on others queues if they failed to be sent to the primary queue.
 2. Round robin, all messages will sent to all configured queues using a round robin algorithm. 
 
 # How to use
